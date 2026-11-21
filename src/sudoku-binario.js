@@ -103,6 +103,11 @@ export class Tabuleiro {
         if (VALORES.some((valor) => valores.filter((x) => x === valor).length > LADO / 2)) {
           encontradas.push({ regra: "balanco", tipo, indice });
         }
+        // Trio: tres iguais em sequencia. A celula vazia nao prolonga a
+        // sequencia, porque ainda pode receber o valor diferente.
+        if (valores.some((valor, i) => valor !== null && i >= 2 && valores[i - 1] === valor && valores[i - 2] === valor)) {
+          encontradas.push({ regra: "trio", tipo, indice });
+        }
       }
     }
     return encontradas;
