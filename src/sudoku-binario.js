@@ -9,10 +9,13 @@ export const LADO = 6;
 
 const VALORES = [0, 1];
 
+const dentroDoTabuleiro = (indice) => Number.isInteger(indice) && indice >= 0 && indice < LADO;
+
 export class Tabuleiro {
   constructor(linhas) {
     if (linhas === undefined) {
       this.celulas = Array.from({ length: LADO }, () => Array(LADO).fill(null));
+      this.pistas = new Set();
       return;
     }
 
@@ -31,6 +34,36 @@ export class Tabuleiro {
     }
 
     this.celulas = linhas.map((linha) => [...linha]);
+
+    // As celulas que vem preenchidas na construcao sao as pistas do puzzle: o
+    // jogador preenche o resto, mas nao reescreve o enunciado.
+    this.pistas = new Set();
+    for (let linha = 0; linha < LADO; linha += 1) {
+      for (let coluna = 0; coluna < LADO; coluna += 1) {
+        if (this.celulas[linha][coluna] !== null) {
+          this.pistas.add(`${linha},${coluna}`);
+        }
+      }
+    }
+  }
+
+  ehPista(linha, coluna) {
+    return this.pistas.has(`${linha},${coluna}`);
+  }
+
+  /** Preenche (linha, coluna) com 0 ou 1, ou apaga a celula com null. */
+  jogar(linha, coluna, valor) {
+    if (!dentroDoTabuleiro(linha) || !dentroDoTabuleiro(coluna)) {
+      throw new Error(`A celula (${linha}, ${coluna}) esta fora do tabuleiro.`);
+    }
+    if (valor !== null && !VALORES.includes(valor)) {
+      throw new Error(`Valor invalido: ${valor}. Use 0, 1 ou null.`);
+    }
+    if (this.ehPista(linha, coluna)) {
+      throw new Error(`A celula (${linha}, ${coluna}) e uma pista do puzzle: nao pode ser alterada.`);
+    }
+
+    this.celulas[linha][coluna] = valor;
   }
 
   valor(linha, coluna) {
