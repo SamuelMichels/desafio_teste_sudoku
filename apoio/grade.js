@@ -11,3 +11,10 @@ import { Tabuleiro } from "../src/sudoku-binario.js";
  */
 export const de = (...linhas) =>
   new Tabuleiro(linhas.map((linha) => [...linha].map((c) => (c === "." ? null : Number(c)))));
+
+/**
+ * Uma solucao valida do 6 x 6: 3 zeros e 3 uns em cada linha e coluna, sem tres
+ * iguais em sequencia, sem linha ou coluna repetida. Serve de ponto de partida
+ * para os cenarios que precisam de um tabuleiro legitimo.
+ */
+export const SOLUCAO = ["001011", "001101", "110010", "010011", "101100", "110100"];

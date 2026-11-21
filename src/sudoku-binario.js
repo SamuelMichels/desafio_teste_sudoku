@@ -86,27 +86,45 @@ export class Tabuleiro {
     return this.celulas.map((linha) => linha[indice]);
   }
 
+  #faixa(tipo, indice) {
+    return tipo === "linha" ? this.#linha(indice) : this.#coluna(indice);
+  }
+
   /**
    * As regras violadas pelo que esta no tabuleiro agora. Cada violacao diz a
    * regra, se e numa linha ou numa coluna, e o indice da faixa. A ordem e
-   * deterministica (as 6 linhas e depois as 6 colunas) para que o caso de teste
-   * possa comparar a lista inteira de uma vez.
+   * deterministica (as 6 linhas e depois as 6 colunas, e dentro de cada faixa a
+   * ordem das regras) para que o caso de teste possa comparar a lista inteira
+   * de uma vez.
    */
   violacoes() {
     const encontradas = [];
     for (const tipo of ["linha", "coluna"]) {
       for (let indice = 0; indice < LADO; indice += 1) {
-        const valores = tipo === "linha" ? this.#linha(indice) : this.#coluna(indice);
+        const valores = this.#faixa(tipo, indice);
+
         // Balanco: metade de cada valor, ou seja 3 e 3. O quarto valor igual ja
         // e violacao mesmo com a faixa incompleta, porque nao existe
         // preenchimento das celulas restantes que conserte a contagem.
         if (VALORES.some((valor) => valores.filter((x) => x === valor).length > LADO / 2)) {
           encontradas.push({ regra: "balanco", tipo, indice });
         }
+
         // Trio: tres iguais em sequencia. A celula vazia nao prolonga a
         // sequencia, porque ainda pode receber o valor diferente.
         if (valores.some((valor, i) => valor !== null && i >= 2 && valores[i - 1] === valor && valores[i - 2] === valor)) {
           encontradas.push({ regra: "trio", tipo, indice });
+        }
+
+        // Repeticao: so se cobra entre faixas completas, porque uma faixa com
+        // celula vazia ainda pode terminar diferente. A violacao fica na faixa
+        // repetida, de indice maior, e nao na primeira ocorrencia.
+        if (!valores.includes(null)) {
+          const repetida = Array.from({ length: indice }, (_, anterior) => this.#faixa(tipo, anterior))
+            .some((outra) => !outra.includes(null) && outra.every((valor, i) => valor === valores[i]));
+          if (repetida) {
+            encontradas.push({ regra: "repeticao", tipo, indice });
+          }
         }
       }
     }
