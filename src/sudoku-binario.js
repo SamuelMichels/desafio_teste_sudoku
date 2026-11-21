@@ -131,6 +131,15 @@ export class Tabuleiro {
     return encontradas;
   }
 
+  completo() {
+    return this.vazias() === 0;
+  }
+
+  /** Resolvido e completo sem violar regra: faltar celula ou violar nao resolve. */
+  resolvido() {
+    return this.completo() && this.valido();
+  }
+
   valido() {
     return this.violacoes().length === 0;
   }
