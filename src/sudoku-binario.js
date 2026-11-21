@@ -77,4 +77,38 @@ export class Tabuleiro {
   vazias() {
     return this.celulas.flat().filter((valor) => valor === null).length;
   }
+
+  #linha(indice) {
+    return this.celulas[indice];
+  }
+
+  #coluna(indice) {
+    return this.celulas.map((linha) => linha[indice]);
+  }
+
+  /**
+   * As regras violadas pelo que esta no tabuleiro agora. Cada violacao diz a
+   * regra, se e numa linha ou numa coluna, e o indice da faixa. A ordem e
+   * deterministica (as 6 linhas e depois as 6 colunas) para que o caso de teste
+   * possa comparar a lista inteira de uma vez.
+   */
+  violacoes() {
+    const encontradas = [];
+    for (const tipo of ["linha", "coluna"]) {
+      for (let indice = 0; indice < LADO; indice += 1) {
+        const valores = tipo === "linha" ? this.#linha(indice) : this.#coluna(indice);
+        // Balanco: metade de cada valor, ou seja 3 e 3. O quarto valor igual ja
+        // e violacao mesmo com a faixa incompleta, porque nao existe
+        // preenchimento das celulas restantes que conserte a contagem.
+        if (VALORES.some((valor) => valores.filter((x) => x === valor).length > LADO / 2)) {
+          encontradas.push({ regra: "balanco", tipo, indice });
+        }
+      }
+    }
+    return encontradas;
+  }
+
+  valido() {
+    return this.violacoes().length === 0;
+  }
 }
