@@ -121,7 +121,7 @@ export class Tabuleiro {
         // repetida, de indice maior, e nao na primeira ocorrencia.
         if (!valores.includes(null)) {
           const repetida = Array.from({ length: indice }, (_, anterior) => this.#faixa(tipo, anterior))
-            .some((outra) => !outra.includes(null) && outra.every((valor, i) => valor === valores[i]));
+            .some((outra) => outra.every((valor, i) => valor === valores[i]));
           if (repetida) {
             encontradas.push({ regra: "repeticao", tipo, indice });
           }
