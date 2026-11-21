@@ -131,6 +131,45 @@ export class Tabuleiro {
     return encontradas;
   }
 
+  /**
+   * As grades que completam este tabuleiro sem violar nenhuma regra, no maximo
+   * `limite`. Busca por tentativa e erro: preenche as celulas vazias em ordem e
+   * volta atras na primeira violacao, o que descarta o ramo inteiro em vez de
+   * montar as 2^vazias combinacoes. O tabuleiro de onde a busca partiu nao e
+   * alterado, e as pistas nao sao reescritas.
+   */
+  solucoes(limite = 2) {
+    const busca = new Tabuleiro(this.grade());
+    const vazias = [];
+    for (let linha = 0; linha < LADO; linha += 1) {
+      for (let coluna = 0; coluna < LADO; coluna += 1) {
+        if (busca.celulas[linha][coluna] === null) {
+          vazias.push([linha, coluna]);
+        }
+      }
+    }
+
+    const encontradas = [];
+    const passo = (indice) => {
+      if (encontradas.length >= limite || !busca.valido()) {
+        return;
+      }
+      if (indice === vazias.length) {
+        encontradas.push(busca.grade());
+        return;
+      }
+      const [linha, coluna] = vazias[indice];
+      for (const valor of VALORES) {
+        busca.celulas[linha][coluna] = valor;
+        passo(indice + 1);
+        busca.celulas[linha][coluna] = null;
+      }
+    };
+    passo(0);
+
+    return encontradas;
+  }
+
   completo() {
     return this.vazias() === 0;
   }

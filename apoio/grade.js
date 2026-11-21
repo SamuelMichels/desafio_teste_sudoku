@@ -18,3 +18,9 @@ export const de = (...linhas) =>
  * para os cenarios que precisam de um tabuleiro legitimo.
  */
 export const SOLUCAO = ["001011", "001101", "110010", "010011", "101100", "110100"];
+
+/**
+ * Um puzzle de 8 pistas com solucao unica, obtido de SOLUCAO apagando pistas
+ * enquanto a unicidade se manteve. E o puzzle de exemplo do README.
+ */
+export const PUZZLE = ["0...1.", ".0....", "...0..", "..00..", "1.....", ".....0"];
